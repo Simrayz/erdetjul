@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Er det jul?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #2c3e50;
+            background: linear-gradient(165deg, #1a252f 0%, #2c3e50 50%, #1a252f 100%);
+            font-family: 'Georgia', serif;
+            color: #e8e4e1;
+            overflow-x: hidden;
+        }
+
+        .snowflakes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .snowflake {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1em;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 8px;
+            color: #e8e4e1;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            margin-bottom: 40px;
+            color: #a67c6d;
+            letter-spacing: 2px;
+        }
+
+        .countdown-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .countdown {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .time-box {
+            background: rgba(139, 90, 80, 0.15);
+            border-radius: 12px;
+            padding: 20px 30px;
+            min-width: 100px;
+            text-align: center;
+            border: 1px solid rgba(166, 124, 109, 0.2);
+        }
+
+        .time-box .number {
+            font-size: 3rem;
+            font-weight: 300;
+            color: #e8e4e1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .time-box .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #a67c6d;
+            margin-top: 8px;
+        }
+
+        .target-date {
+            font-size: 0.95rem;
+            color: #a67c6d;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .settings-toggle {
+            background: rgba(166, 124, 109, 0.12);
+            border: 1px solid rgba(166, 124, 109, 0.35);
+            color: #c9a99c;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+
+        .settings-toggle:hover {
+            background: rgba(166, 124, 109, 0.22);
+            border-color: rgba(166, 124, 109, 0.5);
+            color: #e8e4e1;
+        }
+
+        .settings {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            max-width: 350px;
+            width: 100%;
+            display: none;
+        }
+
+        .settings.open {
+            display: block;
+        }
+
+        .settings h2 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #e8e4e1;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a67c6d;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(166, 124, 109, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 1rem;
+            color: #e8e4e1;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(166, 124, 109, 0.6);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(139, 90, 80, 0.2);
+            color: #e8e4e1;
+            border: 1px solid rgba(166, 124, 109, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+
+        .save-btn:hover {
+            background: rgba(139, 90, 80, 0.35);
+            border-color: rgba(166, 124, 109, 0.5);
+        }
+
+        .tree {
+            font-size: 3rem;
+            margin: 20px 0;
+            opacity: 0.9;
+        }
+
+        .message {
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .message.success {
+            background: rgba(107, 142, 118, 0.2);
+            color: #8fae97;
+            display: block;
+        }
+
+        .celebration {
+            font-size: 1.5rem;
+            text-align: center;
+            color: #a67c6d;
+            margin-top: 20px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .time-box {
+                min-width: 70px;
+                padding: 15px 20px;
+            }
+
+            .time-box .number {
+                font-size: 2rem;
+            }
+
+            .countdown {
+                gap: 10px;
+            }
+
+            .countdown-container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="snowflakes" id="snowflakes"></div>
+
+    <div class="container">
+        <div class="tree">🎄</div>
+        <h1>Er det jul?</h1>
+        <p class="subtitle">Snøen daler lett og fin, men når starter julen din?</p>
+
+        <div class="countdown-container">
+            <div class="countdown" id="countdown">
+                <div class="time-box">
+                    <div class="number" id="days">00</div>
+                    <div class="label">Dager</div>
+                </div>
+                <div class="time-box">
+                    <div class="number" id="hours">00</div>
+                    <div class="label">Timer</div>
+                </div>
+                <div class="time-box">
+                    <div class="number" id="minutes">00</div>
+                    <div class="label">Minutter</div>
+                </div>
+                <div class="time-box">
+                    <div class="number" id="seconds">00</div>
+                    <div class="label">Sekunder</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="target-date" id="targetDate"></div>
+        <button class="settings-toggle" onclick="toggleSettings()">Endre dato</button>
+
+        <div class="settings" id="settings">
+            <h2>Når starter ferien?</h2>
+            <div class="form-group">
+                <label for="vacationDate">Dato:</label>
+                <input type="date" id="vacationDate">
+            </div>
+            <div class="form-group">
+                <label for="vacationTime">Klokkeslett:</label>
+                <input type="time" id="vacationTime" value="16:00">
+            </div>
+            <button class="save-btn" onclick="saveSettings()">Lagre</button>
+            <div class="message" id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle settings panel
+        function toggleSettings() {
+            const settings = document.getElementById('settings');
+            settings.classList.toggle('open');
+        }
+
+        // Create snowflakes
+        function createSnowflakes() {
+            const container = document.getElementById('snowflakes');
+            const snowflakeChars = ['❄', '❅', '❆', '✻', '✼'];
+
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.innerHTML = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                snowflake.style.animationDelay = (Math.random() * 10) + 's';
+                snowflake.style.fontSize = (Math.random() * 1.5 + 0.5) + 'em';
+                snowflake.style.opacity = Math.random() * 0.6 + 0.4;
+                container.appendChild(snowflake);
+            }
+        }
+
+        // Load saved settings
+        function loadSettings() {
+            const savedDate = localStorage.getItem('vacationDate');
+            const savedTime = localStorage.getItem('vacationTime');
+
+            if (savedDate) {
+                document.getElementById('vacationDate').value = savedDate;
+            } else {
+                // Default to December 23rd of current year
+                const year = new Date().getFullYear();
+                const defaultDate = `${year}-12-23`;
+                document.getElementById('vacationDate').value = defaultDate;
+            }
+
+            if (savedTime) {
+                document.getElementById('vacationTime').value = savedTime;
+            }
+        }
+
+        // Save settings
+        function saveSettings() {
+            const date = document.getElementById('vacationDate').value;
+            const time = document.getElementById('vacationTime').value;
+
+            if (!date) {
+                showMessage('Velg en dato!', false);
+                return;
+            }
+
+            localStorage.setItem('vacationDate', date);
+            localStorage.setItem('vacationTime', time || '16:00');
+
+            showMessage('Lagret!', true);
+            updateCountdown();
+            updateTargetDateDisplay();
+
+            // Close the settings panel after saving
+            setTimeout(() => {
+                document.getElementById('settings').classList.remove('open');
+            }, 1500);
+        }
+
+        // Update target date display
+        function updateTargetDateDisplay() {
+            const date = localStorage.getItem('vacationDate') || document.getElementById('vacationDate').value;
+            const time = localStorage.getItem('vacationTime') || '16:00';
+
+            if (!date) return;
+
+            const targetDate = new Date(`${date}T${time}:00`);
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            };
+            const formatted = targetDate.toLocaleString('nb-NO', options);
+            document.getElementById('targetDate').textContent = formatted;
+        }
+
+        // Show message
+        function showMessage(text, isSuccess) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + (isSuccess ? 'success' : 'error');
+
+            setTimeout(() => {
+                msg.className = 'message';
+            }, 3000);
+        }
+
+        // Update countdown
+        function updateCountdown() {
+            const date = localStorage.getItem('vacationDate') || document.getElementById('vacationDate').value;
+            const time = localStorage.getItem('vacationTime') || '16:00';
+
+            if (!date) return;
+
+            const targetDate = new Date(`${date}T${time}:00`);
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+
+                const container = document.querySelector('.countdown-container');
+                if (!document.querySelector('.celebration')) {
+                    const celebration = document.createElement('div');
+                    celebration.className = 'celebration';
+                    celebration.innerHTML = '🎉 Nå er det ferie! God jul! 🎄';
+                    container.appendChild(celebration);
+                }
+                return;
+            }
+
+            // Remove celebration message if it exists
+            const celebration = document.querySelector('.celebration');
+            if (celebration) celebration.remove();
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        // Initialize
+        createSnowflakes();
+        loadSettings();
+        updateCountdown();
+        updateTargetDateDisplay();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
