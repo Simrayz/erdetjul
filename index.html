@@ -480,6 +480,11 @@
             localStorage.setItem('vacationDate', date);
             localStorage.setItem('vacationTime', time || '16:00');
 
+            // Remove query params from URL so shared links don't override other users' settings
+            if (window.location.search) {
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+
             showMessage('Lagret!', true);
             updateCountdown();
             updateTargetDateDisplay();
