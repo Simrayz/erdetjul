@@ -252,24 +252,80 @@
 
         @media (max-width: 600px) {
             h1 {
-                font-size: 1.6rem;
+                font-size: 1.4rem;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 25px;
+                padding: 0 10px;
+            }
+
+            .tree {
+                font-size: 2.5rem;
+                margin: 15px 0;
             }
 
             .time-box {
-                min-width: 70px;
-                padding: 15px 20px;
+                min-width: 60px;
+                padding: 12px 10px;
             }
 
             .time-box .number {
-                font-size: 2rem;
+                font-size: 1.5rem;
+            }
+
+            .time-box .label {
+                font-size: 0.6rem;
+                letter-spacing: 1px;
             }
 
             .countdown {
-                gap: 10px;
+                gap: 8px;
+                flex-wrap: nowrap;
             }
 
             .countdown-container {
-                padding: 25px;
+                padding: 20px 15px;
+                width: 100%;
+            }
+
+            .target-date {
+                font-size: 0.85rem;
+                padding: 0 10px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+                padding: 0 20px;
+            }
+
+            .settings-toggle {
+                width: 100%;
+            }
+
+            .settings {
+                margin: 0 15px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .time-box {
+                min-width: 50px;
+                padding: 10px 8px;
+            }
+
+            .time-box .number {
+                font-size: 1.3rem;
+            }
+
+            .time-box .label {
+                font-size: 0.55rem;
+            }
+
+            .countdown {
+                gap: 5px;
             }
         }
     </style>
@@ -399,18 +455,7 @@
             const time = localStorage.getItem('vacationTime') || document.getElementById('vacationTime').value || '16:00';
 
             const url = `${window.location.origin}${window.location.pathname}?dt=${date}T${time}`;
-
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Er det jul?',
-                    text: 'Se hvor lenge det er til juleferie!',
-                    url: url
-                }).catch(() => {
-                    copyToClipboard(url);
-                });
-            } else {
-                copyToClipboard(url);
-            }
+            copyToClipboard(url);
         }
 
         // Copy to clipboard fallback
