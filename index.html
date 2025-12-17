@@ -120,6 +120,14 @@
             text-align: center;
         }
 
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         .settings-toggle {
             background: rgba(166, 124, 109, 0.12);
             border: 1px solid rgba(166, 124, 109, 0.35);
@@ -129,7 +137,6 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 20px;
             font-family: inherit;
         }
 
@@ -297,7 +304,10 @@
         </div>
 
         <div class="target-date" id="targetDate"></div>
-        <button class="settings-toggle" onclick="toggleSettings()">Endre dato</button>
+        <div class="button-group">
+            <button class="settings-toggle" onclick="toggleSettings()">Endre dato</button>
+            <button class="settings-toggle" onclick="shareCountdown()">Del nedtellingen</button>
+        </div>
 
         <div class="settings" id="settings">
             <h2>Når starter ferien?</h2>
@@ -339,8 +349,33 @@
             }
         }
 
+        // Check for URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const datetime = params.get('dt');
+            if (datetime) {
+                // Expected format: YYYY-MM-DDTHH:MM or YYYY-MM-DD
+                const parts = datetime.split('T');
+                const date = parts[0];
+                const time = parts[1] || '16:00';
+                return { date, time };
+            }
+            return null;
+        }
+
         // Load saved settings
         function loadSettings() {
+            // First check URL parameters
+            const urlParams = getUrlParams();
+            if (urlParams) {
+                document.getElementById('vacationDate').value = urlParams.date;
+                document.getElementById('vacationTime').value = urlParams.time;
+                // Save to localStorage so it persists
+                localStorage.setItem('vacationDate', urlParams.date);
+                localStorage.setItem('vacationTime', urlParams.time);
+                return;
+            }
+
             const savedDate = localStorage.getItem('vacationDate');
             const savedTime = localStorage.getItem('vacationTime');
 
@@ -356,6 +391,35 @@
             if (savedTime) {
                 document.getElementById('vacationTime').value = savedTime;
             }
+        }
+
+        // Share countdown
+        function shareCountdown() {
+            const date = localStorage.getItem('vacationDate') || document.getElementById('vacationDate').value;
+            const time = localStorage.getItem('vacationTime') || document.getElementById('vacationTime').value || '16:00';
+
+            const url = `${window.location.origin}${window.location.pathname}?dt=${date}T${time}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Er det jul?',
+                    text: 'Se hvor lenge det er til juleferie!',
+                    url: url
+                }).catch(() => {
+                    copyToClipboard(url);
+                });
+            } else {
+                copyToClipboard(url);
+            }
+        }
+
+        // Copy to clipboard fallback
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('Lenke kopiert!', true);
+            }).catch(() => {
+                showMessage('Kunne ikke kopiere lenken', false);
+            });
         }
 
         // Save settings
